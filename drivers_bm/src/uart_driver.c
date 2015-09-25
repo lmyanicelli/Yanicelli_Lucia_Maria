@@ -31,19 +31,18 @@
  *
  */
 
-#ifndef interrupcion_H
-#define interrupcion_H
-/** \brief Bare Metal example header file
+/** \brief Blinking Bare Metal example source file
  **
- ** This is a mini example of the CIAA Firmware
+ ** This is a mini example of the CIAA Firmware.
  **
  **/
 
 /** \addtogroup CIAA_Firmware CIAA Firmware
  ** @{ */
+
 /** \addtogroup Examples CIAA Firmware Examples
  ** @{ */
-/** \addtogroup Baremetal Bare Metal example header file
+/** \addtogroup Baremetal Bare Metal example source file
  ** @{ */
 
 /*
@@ -59,7 +58,8 @@
  */
 
 /*==================[inclusions]=============================================*/
-#include "stdint.h"
+#include "uart_driver.h"       /* <= own header */
+
 
 #ifndef CPU
 #error CPU shall be defined
@@ -70,76 +70,57 @@
 #else
 #endif
 
-/*==================[macros]=================================================*/
-#define lpc4337            1
-#define mk60fx512vlq15     2
 
-/*LED_RGB */
-#define LED_ROJO 4
-#define LED_VERDE 5
-#define LED_AZUL 6
+/*==================[macros and definitions]=================================*/
 
+/*==================[internal data declaration]==============================*/
 
-/*LED_PORT */
-#define LED_RGB_PORT 5
+/*==================[internal functions declaration]=========================*/
 
+/*==================[internal data definition]===============================*/
 
-/*LED_BIT */
-#define LED_RGB_ROJO 0
-#define LED_RGB_VERDE 1
-#define LED_RGB_AZUL 2
+/*==================[external data definition]===============================*/
 
+/*==================[internal functions definition]==========================*/
 
+/*==================[external functions definition]==========================*/
+/** \brief Main function
+ *
+ * This is the main entry point of the software.
+ *
+ * \returns 0
+ *
+ * \remarks This function never returns. Return value is only to avoid compiler
+ *          warnings or errors.
+ */
+char data_e, data_r;
 
-/*==================[typedef]================================================*/
+void configurar_UART(void)
+{
 
-/*==================[external data declaration]==============================*/
-#if (CPU == mk60fx512vlq15)
-/* Reset_Handler is defined in startup_MK60F15.S_CPP */
-void Reset_Handler( void );
+	Chip_SCU_PinMux(7,1,MD_PDN,FUNC6);
+	Chip_SCU_PinMux(7,2,MD_PLN|MD_EZI|MD_ZI, FUNC6);
+	Chip_UART_Init(LPC_USART2);
+	Chip_UART_SetBaud(LPC_USART2, 9600);
+	Chip_UART_SetupFIFOS(LPC_USART2, UART_FCR_FIFO_EN | UART_FCR_TRG_LEV0);
+	Chip_UART_TXEnable(LPC_USART2);
+}
 
-extern uint32_t __StackTop;
-#elif (CPU == lpc4337)
-/** \brief Reset ISR
- **
- ** ResetISR is defined in cr_startup_lpc43xx.c
- **
- ** \remark the definition is in
- **         externals/drivers/cortexM4/lpc43xx/src/cr_startup_lpc43xx.c
- **/
-extern void ResetISR(void);
+char recibir_UART(void)
+{
+	Chip_UART_ReadByte(LPC_USART2);
+	return data_r;
+}
+void enviar_UART(char data_e)
+{
+	Chip_UART_SendByte(LPC_USART2, data_e);
+}
 
-/** \brief Stack Top address
- **
- ** External declaration for the pointer to the stack top from the Linker Script
- **
- ** \remark only a declaration is needed, there is no definition, the address
- **         is set in the linker script:
- **         externals/base/cortexM4/lpc43xx/linker/ciaa_lpc4337.ld.
- **/
-extern void _vStackTop(void);
-
-
-
-void RIT_IRQHandler(void);
-
-
-#else
-#endif
-
-/*==================[external functions declaration]=========================*/
-
-
-void inicializar_timer (int);
-void ISR_interrumpe (void);
-void habilitar_interrupcion (int);
-
-
-
+//habilitar int NVIC_enable
+//
 
 /** @} doxygen end group definition */
 /** @} doxygen end group definition */
 /** @} doxygen end group definition */
 /*==================[end of file]============================================*/
-#endif /* #ifndef MI_NUEVO_PROYECTO_H */
 

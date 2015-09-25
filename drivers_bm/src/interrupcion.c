@@ -89,6 +89,7 @@ int tecla1, tecla2, tecla3, tecla4, vector_tecla;
  */
 int led_n;
 int tiempo;
+int n;
 
 
 void inicializar_timer (int tiempo)
@@ -97,7 +98,9 @@ void inicializar_timer (int tiempo)
 	Chip_RIT_SetTimerInterval(LPC_RITIMER, tiempo);
 }
 
-
+void habilitar_interrupcion (int n){
+	NVIC_EnableIRQ(n);
+}
 
 
 

@@ -31,19 +31,18 @@
  *
  */
 
-#ifndef interrupcion_H
-#define interrupcion_H
-/** \brief Bare Metal example header file
+/** \brief Blinking Bare Metal example source file
  **
- ** This is a mini example of the CIAA Firmware
+ ** This is a mini example of the CIAA Firmware.
  **
  **/
 
 /** \addtogroup CIAA_Firmware CIAA Firmware
  ** @{ */
+
 /** \addtogroup Examples CIAA Firmware Examples
  ** @{ */
-/** \addtogroup Baremetal Bare Metal example header file
+/** \addtogroup Baremetal Bare Metal example source file
  ** @{ */
 
 /*
@@ -59,7 +58,8 @@
  */
 
 /*==================[inclusions]=============================================*/
-#include "stdint.h"
+#include "ea_driver.h"       /* <= own header */
+
 
 #ifndef CPU
 #error CPU shall be defined
@@ -70,76 +70,61 @@
 #else
 #endif
 
-/*==================[macros]=================================================*/
-#define lpc4337            1
-#define mk60fx512vlq15     2
 
-/*LED_RGB */
-#define LED_ROJO 4
-#define LED_VERDE 5
-#define LED_AZUL 6
+/*==================[macros and definitions]=================================*/
+
+/*==================[internal data declaration]==============================*/
+
+/*==================[internal functions declaration]=========================*/
+
+/*==================[internal data definition]===============================*/
+
+/*==================[external data definition]===============================*/
+
+/*==================[internal functions definition]==========================*/
+
+/*==================[external functions definition]==========================*/
+/** \brief Main function
+ *
+ * This is the main entry point of the software.
+ *
+ * \returns 0
+ *
+ * \remarks This function never returns. Return value is only to avoid compiler
+ *          warnings or errors.
+ */
+int dato, estado;
 
 
-/*LED_PORT */
-#define LED_RGB_PORT 5
+void inicializar_ADC(void)
+{
+	ADC_CLOCK_SETUP_T cu;
+	cu.adcRate=ADC_MAX_SAMPLE_RATE; ///cu.adcRate=ADC_MAX_SAMPLE_RATE;
+	cu.bitsAccuracy=ADC_10BITS;
+	cu.burstMode=false;
+//	Chip_SCU_ADC_Channel_Config(LPC_ADC0, ADC_CH1);
+	Chip_ADC_Init(LPC_ADC0, &cu);
+	Chip_ADC_EnableChannel(LPC_ADC0, ADC_CH1, ENABLE);
 
 
-/*LED_BIT */
-#define LED_RGB_ROJO 0
-#define LED_RGB_VERDE 1
-#define LED_RGB_AZUL 2
-
-
-
-/*==================[typedef]================================================*/
-
-/*==================[external data declaration]==============================*/
-#if (CPU == mk60fx512vlq15)
-/* Reset_Handler is defined in startup_MK60F15.S_CPP */
-void Reset_Handler( void );
-
-extern uint32_t __StackTop;
-#elif (CPU == lpc4337)
-/** \brief Reset ISR
- **
- ** ResetISR is defined in cr_startup_lpc43xx.c
- **
- ** \remark the definition is in
- **         externals/drivers/cortexM4/lpc43xx/src/cr_startup_lpc43xx.c
- **/
-extern void ResetISR(void);
-
-/** \brief Stack Top address
- **
- ** External declaration for the pointer to the stack top from the Linker Script
- **
- ** \remark only a declaration is needed, there is no definition, the address
- **         is set in the linker script:
- **         externals/base/cortexM4/lpc43xx/linker/ciaa_lpc4337.ld.
- **/
-extern void _vStackTop(void);
+}
 
 
 
-void RIT_IRQHandler(void);
+int leer_ADC(void)
+{
+	Chip_ADC_SetStartMode(LPC_ADC0, ADC_START_NOW, ADC_TRIGGERMODE_RISING);
+	while (Chip_ADC_ReadStatus(LPC_ADC0,  ADC_CH1 , ADC_DR_DONE_STAT)!= SET);
+	Chip_ADC_ReadValue(LPC_ADC0, ADC_CH1, &dato);
+	return dato;
 
+}
 
-#else
-#endif
-
-/*==================[external functions declaration]=========================*/
-
-
-void inicializar_timer (int);
-void ISR_interrumpe (void);
-void habilitar_interrupcion (int);
-
-
-
+//habilitar int NVIC_enable
+//
 
 /** @} doxygen end group definition */
 /** @} doxygen end group definition */
 /** @} doxygen end group definition */
 /*==================[end of file]============================================*/
-#endif /* #ifndef MI_NUEVO_PROYECTO_H */
 

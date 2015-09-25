@@ -31,8 +31,8 @@
  *
  */
 
-#ifndef interrupcion_H
-#define interrupcion_H
+#ifndef ea_driver_H
+#define ea_driver_H
 /** \brief Bare Metal example header file
  **
  ** This is a mini example of the CIAA Firmware
@@ -69,26 +69,9 @@
 #elif (mk60fx512vlq15 == CPU)
 #else
 #endif
-
 /*==================[macros]=================================================*/
 #define lpc4337            1
 #define mk60fx512vlq15     2
-
-/*LED_RGB */
-#define LED_ROJO 4
-#define LED_VERDE 5
-#define LED_AZUL 6
-
-
-/*LED_PORT */
-#define LED_RGB_PORT 5
-
-
-/*LED_BIT */
-#define LED_RGB_ROJO 0
-#define LED_RGB_VERDE 1
-#define LED_RGB_AZUL 2
-
 
 
 /*==================[typedef]================================================*/
@@ -127,15 +110,11 @@ void RIT_IRQHandler(void);
 #else
 #endif
 
+void inicializar_ADC(void);
+int leer_ADC(void);
+
+
 /*==================[external functions declaration]=========================*/
-
-
-void inicializar_timer (int);
-void ISR_interrumpe (void);
-void habilitar_interrupcion (int);
-
-
-
 
 /** @} doxygen end group definition */
 /** @} doxygen end group definition */
